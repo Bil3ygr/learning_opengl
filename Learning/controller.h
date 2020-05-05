@@ -3,6 +3,8 @@
 #include "Lession1/shader.h"
 #include "Lession1/texture.h"
 
+#ifndef _CONTROLLER_H
+
 class Controller
 {
 public:
@@ -36,3 +38,5 @@ private:
 	void(*_draw)();
 	bool depthEnable = false;
 };
+
+#endif // !_CONTROLLER_H

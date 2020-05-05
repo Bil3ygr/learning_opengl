@@ -1,5 +1,8 @@
 #pragma once
+
 #include "../main.h"
+
+#ifndef _TEXTURE_H
 
 struct ImageData
 {
@@ -23,6 +26,8 @@ unsigned int create2DTextureFromData(
 	GLenum minfilter = GL_LINEAR,
 	GLenum maxfilter = GL_LINEAR,
 	GLenum colorType = GL_RGB,
-	float* borderColor = new float[4] {1.0f, 1.0f, 1.0f, 1.0f},
+	float* borderColor = new float[4]{ 1.0f, 1.0f, 1.0f, 1.0f },
 	bool useMipmap = false);
 unsigned int create2DTextureFromFile(const char* filepath);
+
+#endif // !_TEXTURE_H

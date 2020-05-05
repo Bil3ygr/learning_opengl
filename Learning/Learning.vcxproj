@@ -123,6 +123,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="camera.cpp" />
     <ClCompile Include="controller.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="Lession1\creator.cpp" />
@@ -133,7 +134,9 @@
     <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="camera.h" />
     <ClInclude Include="controller.h" />
+    <ClInclude Include="globals.h" />
     <ClInclude Include="Lession1\creator.h" />
     <ClInclude Include="Lession1\shader.h" />
     <ClInclude Include="Lession1\texture.h" />

@@ -2,11 +2,13 @@
 #include "Lession1/shader.h"
 #include "Lession1/texture.h"
 #include "Lession1/creator.h"
+#include "camera.h"
 
 Controller* colorRectController = nullptr;
 Controller* textureRectController = nullptr;
 Controller* cubeController = nullptr;
 Controller* currentController = nullptr;
+Camera* camera = nullptr;
 
 void drawColorRect()
 {
@@ -15,6 +17,7 @@ void drawColorRect()
 
 void createColorRect()
 {
+	camera->setEnable(false);
 	if (!colorRectController)
 	{
 		colorRectController = new Controller("Lession1/vs.glsl", "Lession1/fs.glsl");
@@ -36,6 +39,7 @@ void drawTextureRect()
 
 void createTextureRect()
 {
+	camera->setEnable(false);
 	if (!textureRectController)
 	{
 		textureRectController = new Controller("Lession1/texvs.glsl", "Lession1/texfs.glsl");
@@ -47,15 +51,26 @@ void createTextureRect()
 	currentController = textureRectController;
 }
 
+glm::mat4 getRotateView()
+{
+	float radius = 10.0f;
+	float camX = sin(glfwGetTime()) * radius;
+	float camZ = cos(glfwGetTime()) * radius;
+	return glm::lookAt(glm::vec3(camX, 0.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+}
+
 void drawCube()
 {
 	glm::mat4 model = glm::mat4(1.0f);
-	//model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+	model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	//model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
 	glm::mat4 view = glm::mat4(1.0f);
-	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+	//view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+	//view = getRotateView();
+	view = camera->getView();
 	glm::mat4 projection = glm::mat4(1.0f);
-	projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+	//projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+	projection = camera->getProjection();
 	currentController->setMatrix("model", 1, GL_FALSE, glm::value_ptr(model));
 	currentController->setMatrix("view", 1, GL_FALSE, glm::value_ptr(view));
 	currentController->setMatrix("projection", 1, GL_FALSE, glm::value_ptr(projection));
@@ -64,6 +79,7 @@ void drawCube()
 
 void createCube()
 {
+	camera->setEnable(true);
 	if (!cubeController)
 	{
 		cubeController = new Controller("Lession1/cubevs.glsl", "Lession1/texfs.glsl");
@@ -79,6 +95,32 @@ void createCube()
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
+}
+
+bool firstMouse = true;
+double lastX;
+double lastY;
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+	if (firstMouse)
+	{
+		lastX = xpos;
+		lastY = ypos;
+		firstMouse = false;
+	}
+
+	float xoffset = xpos - lastX;
+	float yoffset = lastY - ypos;
+	lastX = xpos;
+	lastY = ypos;
+	
+	camera->mouseMove(xoffset, yoffset);
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	camera->mouseScroll(yoffset);
 }
 
 GLFWwindow* initGLFW()
@@ -100,6 +142,9 @@ GLFWwindow* initGLFW()
 	}
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetScrollCallback(window, scroll_callback);
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
@@ -110,8 +155,27 @@ GLFWwindow* initGLFW()
 	return window;
 }
 
+float deltaTime = 0;
+float lastFrame = 0;
+
+void calcTime()
+{
+	float currentFrame = glfwGetTime();
+	deltaTime = currentFrame - lastFrame;
+	lastFrame = currentFrame;
+}
+
 void processInput(GLFWwindow* window)
 {
+	if (glfwGetKey(window, GLFW_KEY_W))
+		camera->keyMove(Camera_Movement::FORWARD, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_S))
+		camera->keyMove(Camera_Movement::BACKWARD, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_A))
+		camera->keyMove(Camera_Movement::LEFT, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_D))
+		camera->keyMove(Camera_Movement::RIGHT, deltaTime);
+
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 	else if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
@@ -132,10 +196,12 @@ int start()
 		return -1;
 	}
 
+	camera = new Camera();
 	createColorRect();
 
 	while (!glfwWindowShouldClose(window))
 	{
+		calcTime();
 		processInput(window);
 
 		if (currentController->getProgram() == NULL)
@@ -162,6 +228,8 @@ int start()
 	textureRectController = nullptr;
 	delete cubeController;
 	cubeController = nullptr;
+	delete camera;
+	camera = nullptr;
 
 	glfwTerminate();
 	return 0;
