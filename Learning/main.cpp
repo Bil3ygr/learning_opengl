@@ -102,38 +102,6 @@ void createCube()
 
 glm::vec3 lightPos = glm::vec3(1.2f, 1.0f, 2.0f);
 
-void drawLight()
-{
-	currentController->use();
-
-	currentController->shader->setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-	currentController->shader->setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-	currentController->shader->setVec3("lightPos", lightPos);
-	currentController->shader->setVec3("viewPos", camera->pos);
-
-	glm::mat4 model = glm::mat4(1.0f);
-	glm::mat4 view = camera->getView();
-	glm::mat4 projection = camera->getProjection();
-	currentController->shader->setMat4("model", model);
-	currentController->shader->setMat4("view", view);
-	currentController->shader->setMat4("projection", projection);
-	glDrawArrays(GL_TRIANGLES, 0, 36);
-}
-
-void createLight()
-{
-	camera->setEnable(true);
-	if (!lightController)
-	{
-		lightController = new Controller("Lession2/lightvs.glsl", "Lession2/lightfs.glsl");
-		createLightInfo(lightController);
-		lightController->setDraw(drawLight);
-		lightController->setDepthEnable(true);
-		lightController->setClearColor(0.1f, 0.1f, 0.1f);
-	}
-	currentController = lightController;
-}
-
 void drawLamp()
 {
 	lampController->use();
@@ -158,6 +126,43 @@ void createLamp()
 		createLightInfo(lampController, false);
 		lampController->setDraw(drawLamp);
 	}
+}
+
+void drawLight()
+{
+	currentController->use();
+
+	currentController->shader->setVec3("objectColor", 1.0f, 0.5f, 0.31f);
+	currentController->shader->setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+	currentController->shader->setVec3("lightPos", lightPos);
+	currentController->shader->setVec3("viewPos", camera->pos);
+
+	glm::mat4 model = glm::mat4(1.0f);
+	glm::mat4 view = camera->getView();
+	glm::mat4 projection = camera->getProjection();
+	currentController->shader->setMat4("model", model);
+	currentController->shader->setMat4("view", view);
+	currentController->shader->setMat4("projection", projection);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	if (lampController)
+		lampController->draw();
+}
+
+void createLight()
+{
+	camera->setEnable(true);
+	if (!lightController)
+	{
+		lightController = new Controller("Lession2/lightvs.glsl", "Lession2/lightfs.glsl");
+		createLightInfo(lightController);
+		lightController->setDraw(drawLight);
+		lightController->setDepthEnable(true);
+		lightController->setClearColor(0.1f, 0.1f, 0.1f);
+	}
+	currentController = lightController;
+
+	createLamp();
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -233,8 +238,6 @@ void calcTime()
 	lastFrame = currentFrame;
 }
 
-bool lightEnable = false;
-
 void processInput(GLFWwindow* window)
 {
 	if (glfwGetKey(window, GLFW_KEY_W))
@@ -255,17 +258,7 @@ void processInput(GLFWwindow* window)
 	else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
 		createCube();
 	else if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
-	{
 		createLight();
-		lightEnable = true;
-		createLamp();
-	}
-	else if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
-	{
-		lightEnable = !lightEnable;
-		if (lightEnable)
-			createLamp();
-	}
 }
 
 int start()
@@ -297,9 +290,6 @@ int start()
 		currentController->clear();
 		//currentController->activeTexture(GL_TEXTURE0);
 		currentController->draw();
-
-		if (lightEnable && currentController == lightController)
-			lampController->draw();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

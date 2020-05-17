@@ -11,7 +11,6 @@ uniform vec3 viewPos;
 
 void main()
 {
-    // FragColor = vec4(objectColor * lightColor, 1.0);
 	float ambientStrength = 0.1;
 	vec3 ambient = ambientStrength * lightColor;
 
