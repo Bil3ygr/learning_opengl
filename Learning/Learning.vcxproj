@@ -150,6 +150,10 @@
     <None Include="Lession1\texfs.glsl" />
     <None Include="Lession1\texvs.glsl" />
     <None Include="Lession1\vs.glsl" />
+    <None Include="Lession2\lampfs.glsl" />
+    <None Include="Lession2\lampvs.glsl" />
+    <None Include="Lession2\lightfs.glsl" />
+    <None Include="Lession2\lightvs.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Lession1\container.jpg" />

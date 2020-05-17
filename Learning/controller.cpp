@@ -2,22 +2,23 @@
 
 Controller::Controller(const char* vsfile, const char* fsfile, const char* gsfile)
 {
-	program = createProgram(vsfile, fsfile, gsfile);
+	shader = new Shader(vsfile, fsfile, gsfile);
 }
 
 Controller::~Controller()
 {
 	glDeleteVertexArrays(1, &VAO);
-	glDeleteProgram(program);
+	delete shader;
+	shader = nullptr;
 }
 
 void Controller::setVertexInfo(
 	float* vertices, int vertices_size,
-	int* pointers, int pointer_count,
+	int* pointers, int pointer_count, bool* pointer_enable,
 	int* indices, int indices_size
 )
 {
-	VAO = createVertexInfo(vertices, vertices_size, pointers, pointer_count, indices, indices_size);
+	VAO = createVertexInfo(vertices, vertices_size, pointers, pointer_count, pointer_enable, indices, indices_size);
 }
 
 void Controller::setTexture(const char* filepath)
@@ -40,7 +41,7 @@ void Controller::setDepthEnable(bool enable)
 
 void Controller::use()
 {
-	glUseProgram(program);
+	shader->use();
 	glBindVertexArray(VAO);
 }
 
@@ -78,19 +79,4 @@ void Controller::setDraw(void(*func)())
 void Controller::draw()
 {
 	_draw();
-}
-
-void Controller::setInt(const char* name, GLint value)
-{
-	glUniform1i(glGetUniformLocation(program, name), value);
-}
-
-void Controller::setMatrix(const char* name, GLsizei count, GLboolean transpos, const GLfloat* value)
-{
-	glUniformMatrix4fv(glGetUniformLocation(program, name), count, transpos, value);
-}
-
-unsigned int Controller::getProgram()
-{
-	return program;
 }

@@ -2,7 +2,7 @@
 
 #include "../main.h"
 
-#ifndef _TEXTURE_H
+#ifndef _LESSION1_TEXTURE_H
 
 struct ImageData
 {

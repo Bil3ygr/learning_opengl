@@ -88,6 +88,10 @@
     <None Include="Lession1\cubevs.glsl">
       <Filter>资源文件</Filter>
     </None>
+    <None Include="Lession2\lightvs.glsl" />
+    <None Include="Lession2\lightfs.glsl" />
+    <None Include="Lession2\lampfs.glsl" />
+    <None Include="Lession2\lampvs.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Lession1\container.jpg">

@@ -1,6 +1,7 @@
 #include "texture.h"
 #include "../stb_image.h"
 
+
 unsigned int create2DTextureFromData(
 	ImageData data, 
 	GLenum swrap, 

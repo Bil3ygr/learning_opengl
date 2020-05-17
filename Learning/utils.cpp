@@ -1,5 +1,6 @@
 #include "utils.h"
 
+
 const char* readFile(const char* filename, int filesize)
 {
 	std::ifstream file(filename);

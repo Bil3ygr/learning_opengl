@@ -1,5 +1,6 @@
 #include "camera.h"
 
+
 void Camera::mouseMove(float xoffset, float yoffset, GLboolean limit)
 {
 	if (!_enable)

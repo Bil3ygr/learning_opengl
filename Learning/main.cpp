@@ -7,11 +7,15 @@
 Controller* colorRectController = nullptr;
 Controller* textureRectController = nullptr;
 Controller* cubeController = nullptr;
+Controller* lightController = nullptr;
+Controller* lampController = nullptr;
 Controller* currentController = nullptr;
 Camera* camera = nullptr;
 
 void drawColorRect()
 {
+	currentController->use();
+
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
@@ -30,10 +34,12 @@ void createColorRect()
 
 void drawTextureRect()
 {
+	currentController->use();
+
 	glm::mat4 trans = glm::mat4(1.0f);
 	trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
 	trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
-	currentController->setMatrix("transform", 1, GL_FALSE, glm::value_ptr(trans));
+	currentController->shader->setMat4("transform", trans);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
@@ -61,6 +67,8 @@ glm::mat4 getRotateView()
 
 void drawCube()
 {
+	currentController->use();
+
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 	//model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
@@ -71,9 +79,9 @@ void drawCube()
 	glm::mat4 projection = glm::mat4(1.0f);
 	//projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 	projection = camera->getProjection();
-	currentController->setMatrix("model", 1, GL_FALSE, glm::value_ptr(model));
-	currentController->setMatrix("view", 1, GL_FALSE, glm::value_ptr(view));
-	currentController->setMatrix("projection", 1, GL_FALSE, glm::value_ptr(projection));
+	currentController->shader->setMat4("model", model);
+	currentController->shader->setMat4("view", view);
+	currentController->shader->setMat4("projection", projection);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
@@ -90,6 +98,66 @@ void createCube()
 		cubeController->setClearColor(0.3f, 0.3f, 0.2f);
 	}
 	currentController = cubeController;
+}
+
+glm::vec3 lightPos = glm::vec3(1.2f, 1.0f, 2.0f);
+
+void drawLight()
+{
+	currentController->use();
+
+	currentController->shader->setVec3("objectColor", 1.0f, 0.5f, 0.31f);
+	currentController->shader->setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+	currentController->shader->setVec3("lightPos", lightPos);
+	currentController->shader->setVec3("viewPos", camera->pos);
+
+	glm::mat4 model = glm::mat4(1.0f);
+	glm::mat4 view = camera->getView();
+	glm::mat4 projection = camera->getProjection();
+	currentController->shader->setMat4("model", model);
+	currentController->shader->setMat4("view", view);
+	currentController->shader->setMat4("projection", projection);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+}
+
+void createLight()
+{
+	camera->setEnable(true);
+	if (!lightController)
+	{
+		lightController = new Controller("Lession2/lightvs.glsl", "Lession2/lightfs.glsl");
+		createLightInfo(lightController);
+		lightController->setDraw(drawLight);
+		lightController->setDepthEnable(true);
+		lightController->setClearColor(0.1f, 0.1f, 0.1f);
+	}
+	currentController = lightController;
+}
+
+void drawLamp()
+{
+	lampController->use();
+
+	glm::mat4 model = glm::mat4(1.0f);
+	glm::mat4 view = camera->getView();
+	glm::mat4 projection = camera->getProjection();
+	model = glm::translate(model, lightPos);
+	model = glm::scale(model, glm::vec3(0.2f));
+	lampController->shader->setMat4("model", model);
+	lampController->shader->setMat4("view", view);
+	lampController->shader->setMat4("projection", projection);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+}
+
+void createLamp()
+{
+	camera->setEnable(true);
+	if (!lampController)
+	{
+		lampController = new Controller("Lession2/lampvs.glsl", "Lession2/lampfs.glsl");
+		createLightInfo(lampController, false);
+		lampController->setDraw(drawLamp);
+	}
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -165,6 +233,8 @@ void calcTime()
 	lastFrame = currentFrame;
 }
 
+bool lightEnable = false;
+
 void processInput(GLFWwindow* window)
 {
 	if (glfwGetKey(window, GLFW_KEY_W))
@@ -184,6 +254,18 @@ void processInput(GLFWwindow* window)
 		createTextureRect();
 	else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
 		createCube();
+	else if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
+	{
+		createLight();
+		lightEnable = true;
+		createLamp();
+	}
+	else if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
+	{
+		lightEnable = !lightEnable;
+		if (lightEnable)
+			createLamp();
+	}
 }
 
 int start()
@@ -204,7 +286,7 @@ int start()
 		calcTime();
 		processInput(window);
 
-		if (currentController->getProgram() == NULL)
+		if (currentController->shader == nullptr || currentController->shader->ID == NULL)
 		{
 			glfwTerminate();
 			system("pause");
@@ -213,9 +295,11 @@ int start()
 
 		currentController->setDepthEnable();
 		currentController->clear();
-		currentController->use();
-		currentController->activeTexture(GL_TEXTURE0);
+		//currentController->activeTexture(GL_TEXTURE0);
 		currentController->draw();
+
+		if (lightEnable && currentController == lightController)
+			lampController->draw();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -228,6 +312,10 @@ int start()
 	textureRectController = nullptr;
 	delete cubeController;
 	cubeController = nullptr;
+	delete lightController;
+	lightController = nullptr;
+	delete lampController;
+	lampController = nullptr;
 	delete camera;
 	camera = nullptr;
 

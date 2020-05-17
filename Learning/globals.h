@@ -1,5 +1,6 @@
 #pragma once
 
+
 #ifndef _GLOBALS_H
 
 enum Camera_Movement {

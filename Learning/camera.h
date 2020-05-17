@@ -2,6 +2,7 @@
 #include "main.h"
 #include "globals.h"
 
+
 #ifndef _CAMERA_H
 
 class Camera
