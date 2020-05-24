@@ -1,4 +1,5 @@
 #version 330 core
+
 in layout(location = 0) vec3 pos;
 
 uniform mat4 model;
