@@ -21,9 +21,10 @@ void Controller::setVertexInfo(
 	VAO = createVertexInfo(vertices, vertices_size, pointers, pointer_count, pointer_enable, indices, indices_size);
 }
 
-void Controller::setTexture(const char* filepath)
+int Controller::addTexture(const char* filepath)
 {
-	texture = create2DTextureFromFile(filepath);
+	texture.push_back(create2DTextureFromFile(filepath));
+	return texture.size() - 1;
 }
 
 void Controller::setDepthEnable()
@@ -62,12 +63,16 @@ void Controller::clear()
 		glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void Controller::activeTexture(GLenum index)
+void Controller::activeTexture(GLenum texture_index, int index)
 {
-	if (texture)
+	if (index >= 0 && index < texture.size())
 	{
-		glActiveTexture(index);
-		glBindTexture(GL_TEXTURE_2D, texture);
+		glActiveTexture(texture_index);
+		glBindTexture(GL_TEXTURE_2D, texture[index]);
+	}
+	else
+	{
+		std::cout << "texture index error: " << index << std::endl;
 	}
 }
 

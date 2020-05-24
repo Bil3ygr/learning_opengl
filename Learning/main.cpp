@@ -34,9 +34,9 @@ void createColorRect()
 
 void drawTextureRect()
 {
-	currentController->activeTexture(GL_TEXTURE0);
 	currentController->use();
-	currentController->shader->setInt("texture1", GL_TEXTURE0);
+	currentController->activeTexture(GL_TEXTURE0, 0);
+	currentController->shader->setInt("texture1", 0);
 
 	glm::mat4 trans = glm::mat4(1.0f);
 	trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
@@ -52,7 +52,7 @@ void createTextureRect()
 	{
 		textureRectController = new Controller("Lession1/texvs.glsl", "Lession1/texfs.glsl");
 		createTextureRectInfo(textureRectController);
-		textureRectController->setTexture("Lession1/container.jpg");
+		textureRectController->addTexture("Lession1/container.jpg");
 		textureRectController->setDraw(drawTextureRect);
 		textureRectController->setClearColor(0.3f, 0.2f, 0.3f);
 	}
@@ -69,10 +69,9 @@ glm::mat4 getRotateView()
 
 void drawCube()
 {
-	currentController->activeTexture(GL_TEXTURE0);
 	currentController->use();
-
-	currentController->shader->setInt("texture1", GL_TEXTURE0);
+	currentController->activeTexture(GL_TEXTURE0, 0);
+	currentController->shader->setInt("texture1", 0);
 
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -97,7 +96,7 @@ void createCube()
 	{
 		cubeController = new Controller("Lession1/cubevs.glsl", "Lession1/texfs.glsl");
 		createCubeInfo(cubeController);
-		cubeController->setTexture("Lession1/container.jpg");
+		cubeController->addTexture("Lession1/container.jpg");
 		cubeController->setDraw(drawCube);
 		cubeController->setDepthEnable(true);
 		cubeController->setClearColor(0.3f, 0.3f, 0.2f);
@@ -136,18 +135,21 @@ void createLamp()
 void drawLight()
 {
 	currentController->use();
+	currentController->activeTexture(GL_TEXTURE1, 0);
+	currentController->activeTexture(GL_TEXTURE2, 1);
 
+	currentController->shader->setVec3("viewPos", camera->pos);
 	currentController->shader->setVec3("objectColor", 1.0f, 0.5f, 0.31f);
 	//currentController->shader->setVec3("lightColor", 1.0f, 1.0f, 1.0f);
 	//currentController->shader->setVec3("lightPos", lightPos);
-	currentController->shader->setVec3("viewPos", camera->pos);
 	// material
 	//currentController->shader->setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
 	//currentController->shader->setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
-	currentController->shader->setInt("texDiffuse", 1);
-	//currentController->shader->setInt("material.diffuse", 2);
-	currentController->shader->setVec3("material.specular", 0.5f, 0.5f, 0.5f);
-	currentController->shader->setFloat("material.shininess", 32.0f);
+	//currentController->shader->setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+
+	currentController->shader->setInt("material.diffuse", 1);
+	currentController->shader->setInt("material.specular", 2);
+	currentController->shader->setFloat("material.shininess", 64.0f);
 	// light
 	currentController->shader->setVec3("light.position", lightPos);
 	currentController->shader->setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
@@ -173,8 +175,6 @@ void drawLight()
 
 	if (lampController)
 		lampController->draw();
-
-	currentController->activeTexture(GL_TEXTURE1);
 }
 
 void createLight()
@@ -184,8 +184,8 @@ void createLight()
 	{
 		lightController = new Controller("Lession2/lightvs.glsl", "Lession2/lightfs.glsl");
 		createLightInfo(lightController);
-		//lightController->setTexture("Lession1/container.jpg");
-		lightController->setTexture("Lession2/container2.png");
+		lightController->addTexture("Lession2/container2.png");
+		lightController->addTexture("Lession2/container2_specular.png");
 		lightController->setDraw(drawLight);
 		lightController->setDepthEnable(true);
 		lightController->setClearColor(0.1f, 0.1f, 0.1f);

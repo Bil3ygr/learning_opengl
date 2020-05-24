@@ -52,6 +52,7 @@ unsigned int create2DTextureFromFile(const char *filepath)
 	else
 	{
 		std::cout << "Load texture failed." << std::endl;
+		stbi_image_free(data);
 	}
 
 	return texture;
