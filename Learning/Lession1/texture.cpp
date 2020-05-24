@@ -1,15 +1,13 @@
 #include "texture.h"
 #include "../stb_image.h"
 
-
 unsigned int create2DTextureFromData(
-	ImageData data, 
-	GLenum swrap, 
-	GLenum twrap, 
-	GLenum minfilter, 
-	GLenum maxfilter, 
-	GLenum colorType, 
-	float* borderColor,
+	ImageData data,
+	GLenum swrap,
+	GLenum twrap,
+	GLenum minfilter,
+	GLenum maxfilter,
+	float *borderColor,
 	bool useMipmap)
 {
 	unsigned int texture;
@@ -25,22 +23,29 @@ unsigned int create2DTextureFromData(
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minfilter);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, maxfilter);
 	// 生成
-	glTexImage2D(GL_TEXTURE_2D, 0, colorType, data.width, data.height, 0, data.colorType, GL_UNSIGNED_BYTE, data.data);
+	glTexImage2D(GL_TEXTURE_2D, 0, data.colorType, data.width, data.height, 0, data.colorType, GL_UNSIGNED_BYTE, data.data);
 	// 如果filter有设置mipmap，要生成，否则看不到
 	if (useMipmap)
 		glGenerateMipmap(GL_TEXTURE_2D);
 	return texture;
 }
 
-unsigned int create2DTextureFromFile(const char* filepath)
+unsigned int create2DTextureFromFile(const char *filepath)
 {
 	unsigned int texture = NULL;
 	// 加载并生成
 	int width, height, nrChannels;
-	unsigned char* data = stbi_load(filepath, &width, &height, &nrChannels, 0);
+	unsigned char *data = stbi_load(filepath, &width, &height, &nrChannels, 0);
 	if (data)
 	{
-		ImageData image = ImageData(width, height, data);
+		GLenum colorType;
+		if (nrChannels == 1)
+			colorType = GL_RED;
+		else if (nrChannels == 3)
+			colorType = GL_RGB;
+		else if (nrChannels == 4)
+			colorType = GL_RGBA;
+		ImageData image = ImageData(width, height, data, colorType);
 		texture = create2DTextureFromData(image);
 		stbi_image_free(data);
 	}

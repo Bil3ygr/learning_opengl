@@ -7,10 +7,10 @@
 struct ImageData
 {
 	int width, height;
-	unsigned char* data;
+	unsigned char *data;
 	GLenum colorType;
 
-	ImageData(int _width, int _height, unsigned char* _data, GLenum _colorType = GL_RGB)
+	ImageData(int _width, int _height, unsigned char *_data, GLenum _colorType)
 	{
 		width = _width;
 		height = _height;
@@ -25,9 +25,8 @@ unsigned int create2DTextureFromData(
 	GLenum twrap = GL_REPEAT,
 	GLenum minfilter = GL_LINEAR,
 	GLenum maxfilter = GL_LINEAR,
-	GLenum colorType = GL_RGB,
-	float* borderColor = new float[4]{ 1.0f, 1.0f, 1.0f, 1.0f },
+	float *borderColor = new float[4]{1.0f, 1.0f, 1.0f, 1.0f},
 	bool useMipmap = false);
-unsigned int create2DTextureFromFile(const char* filepath);
+unsigned int create2DTextureFromFile(const char *filepath);
 
 #endif // !_TEXTURE_H
