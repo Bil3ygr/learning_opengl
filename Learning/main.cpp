@@ -34,7 +34,9 @@ void createColorRect()
 
 void drawTextureRect()
 {
+	currentController->activeTexture(GL_TEXTURE0);
 	currentController->use();
+	currentController->shader->setInt("texture1", GL_TEXTURE0);
 
 	glm::mat4 trans = glm::mat4(1.0f);
 	trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
@@ -67,7 +69,10 @@ glm::mat4 getRotateView()
 
 void drawCube()
 {
+	currentController->activeTexture(GL_TEXTURE0);
 	currentController->use();
+
+	currentController->shader->setInt("texture1", GL_TEXTURE0);
 
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -137,24 +142,26 @@ void drawLight()
 	//currentController->shader->setVec3("lightPos", lightPos);
 	currentController->shader->setVec3("viewPos", camera->pos);
 	// material
-	currentController->shader->setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
-	currentController->shader->setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
+	//currentController->shader->setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
+	//currentController->shader->setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
+	currentController->shader->setInt("texDiffuse", 1);
+	//currentController->shader->setInt("material.diffuse", 2);
 	currentController->shader->setVec3("material.specular", 0.5f, 0.5f, 0.5f);
 	currentController->shader->setFloat("material.shininess", 32.0f);
 	// light
 	currentController->shader->setVec3("light.position", lightPos);
-	//currentController->shader->setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
-	//currentController->shader->setVec3("light.diffuse", 0.5f, 0.5, 0.5f);
+	currentController->shader->setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+	currentController->shader->setVec3("light.diffuse", 0.5f, 0.5, 0.5f);
 	currentController->shader->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 	// 随时间变化
-	glm::vec3 lightColor = glm::vec3(1.0f);
-	lightColor.x = sin(glfwGetTime() * 2.0f);
-	lightColor.y = sin(glfwGetTime() * 0.7f);
-	lightColor.z = sin(glfwGetTime() * 1.3f);
-	glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
-	glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
-	currentController->shader->setVec3("light.ambient", ambientColor);
-	currentController->shader->setVec3("light.diffuse", diffuseColor);
+	//glm::vec3 lightColor = glm::vec3(1.0f);
+	//lightColor.x = sin(glfwGetTime() * 2.0f);
+	//lightColor.y = sin(glfwGetTime() * 0.7f);
+	//lightColor.z = sin(glfwGetTime() * 1.3f);
+	//glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
+	//glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
+	//currentController->shader->setVec3("light.ambient", ambientColor);
+	//currentController->shader->setVec3("light.diffuse", diffuseColor);
 
 	glm::mat4 model = glm::mat4(1.0f);
 	glm::mat4 view = camera->getView();
@@ -166,6 +173,8 @@ void drawLight()
 
 	if (lampController)
 		lampController->draw();
+
+	currentController->activeTexture(GL_TEXTURE1);
 }
 
 void createLight()
@@ -175,6 +184,8 @@ void createLight()
 	{
 		lightController = new Controller("Lession2/lightvs.glsl", "Lession2/lightfs.glsl");
 		createLightInfo(lightController);
+		//lightController->setTexture("Lession1/container.jpg");
+		lightController->setTexture("Lession2/container2.png");
 		lightController->setDraw(drawLight);
 		lightController->setDepthEnable(true);
 		lightController->setClearColor(0.1f, 0.1f, 0.1f);
@@ -307,7 +318,6 @@ int start()
 
 		currentController->setDepthEnable();
 		currentController->clear();
-		//currentController->activeTexture(GL_TEXTURE0);
 		currentController->draw();
 
 		glfwSwapBuffers(window);
