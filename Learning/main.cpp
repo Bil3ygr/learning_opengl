@@ -7,7 +7,7 @@
 Controller* colorRectController = nullptr;
 Controller* textureRectController = nullptr;
 Controller* cubeController = nullptr;
-Controller* lightController = nullptr;
+Controller* objectController = nullptr;
 Controller* lampController = nullptr;
 Controller* currentController = nullptr;
 Camera* camera = nullptr;
@@ -150,11 +150,13 @@ void drawLight()
 	currentController->shader->setInt("material.diffuse", 1);
 	currentController->shader->setInt("material.specular", 2);
 	currentController->shader->setFloat("material.shininess", 64.0f);
-	// light
-	currentController->shader->setVec3("light.position", lightPos);
-	currentController->shader->setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
-	currentController->shader->setVec3("light.diffuse", 0.5f, 0.5, 0.5f);
-	currentController->shader->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+	//// light
+	//currentController->shader->setInt("light.type", 1);
+	//currentController->shader->setVec3("light.direction", -0.2f, -1.0f, -0.3f);
+	////currentController->shader->setVec3("light.position", lightPos);
+	//currentController->shader->setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+	//currentController->shader->setVec3("light.diffuse", 0.5f, 0.5, 0.5f);
+	//currentController->shader->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 	// 随时间变化
 	//glm::vec3 lightColor = glm::vec3(1.0f);
 	//lightColor.x = sin(glfwGetTime() * 2.0f);
@@ -164,6 +166,15 @@ void drawLight()
 	//glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
 	//currentController->shader->setVec3("light.ambient", ambientColor);
 	//currentController->shader->setVec3("light.diffuse", diffuseColor);
+
+	// spotlight
+	currentController->shader->setVec3("light.direction", camera->front);
+	currentController->shader->setVec3("light.position", camera->pos);
+	currentController->shader->setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
+	currentController->shader->setFloat("light.outCutOff", glm::cos(glm::radians(17.5f)));
+	currentController->shader->setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+	currentController->shader->setVec3("light.diffuse", 0.5f, 0.5, 0.5f);
+	currentController->shader->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
 	glm::mat4 model = glm::mat4(1.0f);
 	glm::mat4 view = camera->getView();
@@ -180,17 +191,17 @@ void drawLight()
 void createLight()
 {
 	camera->setEnable(true);
-	if (!lightController)
+	if (!objectController)
 	{
-		lightController = new Controller("Lession2/lightvs.glsl", "Lession2/lightfs.glsl");
-		createLightInfo(lightController);
-		lightController->addTexture("Lession2/container2.png");
-		lightController->addTexture("Lession2/container2_specular.png");
-		lightController->setDraw(drawLight);
-		lightController->setDepthEnable(true);
-		lightController->setClearColor(0.1f, 0.1f, 0.1f);
+		objectController = new Controller("Lession2/objectvs.glsl", "Lession2/objectfs.glsl");
+		createLightInfo(objectController);
+		objectController->addTexture("Lession2/container2.png");
+		objectController->addTexture("Lession2/container2_specular.png");
+		objectController->setDraw(drawLight);
+		objectController->setDepthEnable(true);
+		objectController->setClearColor(0.1f, 0.1f, 0.1f);
 	}
-	currentController = lightController;
+	currentController = objectController;
 
 	createLamp();
 }
@@ -331,8 +342,8 @@ int start()
 	textureRectController = nullptr;
 	delete cubeController;
 	cubeController = nullptr;
-	delete lightController;
-	lightController = nullptr;
+	delete objectController;
+	objectController = nullptr;
 	delete lampController;
 	lampController = nullptr;
 	delete camera;
