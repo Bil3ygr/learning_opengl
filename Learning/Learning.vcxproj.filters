@@ -42,6 +42,12 @@
     <ClCompile Include="camera.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Lession3\mesh.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Lession3\model.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -71,6 +77,12 @@
     <ClInclude Include="globals.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Lession3\mesh.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Lession3\model.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Lession1\vs.glsl">
@@ -88,13 +100,21 @@
     <None Include="Lession1\cubevs.glsl">
       <Filter>资源文件</Filter>
     </None>
-    <None Include="Lession2\lightvs.glsl" />
-    <None Include="Lession2\lightfs.glsl" />
     <None Include="Lession2\lampfs.glsl" />
     <None Include="Lession2\lampvs.glsl" />
+    <None Include="Lession2\objectfs.glsl" />
+    <None Include="Lession2\objectvs.glsl" />
+    <None Include="Lession3\modelvs.glsl" />
+    <None Include="Lession3\modelfs.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Lession1\container.jpg">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="Lession2\container2.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="Lession2\container2_specular.png">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>
