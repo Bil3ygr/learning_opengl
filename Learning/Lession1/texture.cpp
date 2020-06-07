@@ -30,12 +30,15 @@ unsigned int create2DTextureFromData(
 	return texture;
 }
 
-unsigned int create2DTextureFromFile(const char *filepath)
+unsigned int create2DTextureFromFile(const char *filepath, const std::string &directory)
 {
+	std::string filename = std::string(filepath);
+	if (!directory.empty())
+		filename = directory + "/" + filename;
 	unsigned int texture = NULL;
 	// 加载并生成
 	int width, height, nrChannels;
-	unsigned char *data = stbi_load(filepath, &width, &height, &nrChannels, 0);
+	unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrChannels, 0);
 	if (data)
 	{
 		GLenum colorType;

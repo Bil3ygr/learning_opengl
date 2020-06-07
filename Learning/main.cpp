@@ -3,12 +3,14 @@
 #include "Lession1/texture.h"
 #include "Lession1/creator.h"
 #include "camera.h"
+#include "Lession3/model.h"
 
 Controller* colorRectController = nullptr;
 Controller* textureRectController = nullptr;
 Controller* cubeController = nullptr;
 Controller* objectController = nullptr;
 Controller* lampController = nullptr;
+Controller* modelController = nullptr;
 Controller* currentController = nullptr;
 Camera* camera = nullptr;
 
@@ -206,6 +208,39 @@ void createLight()
 	createLamp();
 }
 
+Model *myModel = nullptr;
+
+void drawModel()
+{
+	currentController->use();
+
+	glm::mat4 projection = camera->getProjection();
+	glm::mat4 view = camera->getView();
+	currentController->shader->setMat4("projection", projection);
+	currentController->shader->setMat4("view", view);
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
+	model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+	currentController->shader->setMat4("model", model);
+
+	if (!myModel)
+		myModel = new Model("Lession3/nanosuit/nanosuit.obj");
+	myModel->Draw(*(currentController->shader));
+}
+
+void createModel()
+{
+	camera->setEnable(true);
+	if (!modelController)
+	{
+		modelController = new Controller("Lession3/modelvs.glsl", "Lession3/modelfs.glsl");
+		modelController->setDraw(drawModel);
+		modelController->setDepthEnable(true);
+		modelController->setClearColor(0.05f, 0.05f, 0.05f);
+	}
+	currentController = modelController;
+}
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
@@ -300,6 +335,8 @@ void processInput(GLFWwindow* window)
 		createCube();
 	else if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
 		createLight();
+	else if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
+		createModel();
 }
 
 int start()

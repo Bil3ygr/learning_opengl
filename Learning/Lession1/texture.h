@@ -27,6 +27,6 @@ unsigned int create2DTextureFromData(
 	GLenum maxfilter = GL_LINEAR,
 	float *borderColor = new float[4]{1.0f, 1.0f, 1.0f, 1.0f},
 	bool useMipmap = false);
-unsigned int create2DTextureFromFile(const char *filepath);
+unsigned int create2DTextureFromFile(const char *filepath, const std::string &directory="");
 
 #endif // !_TEXTURE_H
